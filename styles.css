@@ -746,4 +746,37 @@ input[type="range"] {
   .mono{ font-size: 12px; }
   .tbl{ min-width: 420px; }
 }
+/* ===== Фикс масштаба и вылезания текста на телефонах ===== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Чтобы длинные строки переносились */
+h1, h2, h3, p, .mono, .subtitle {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Немного уменьшаем заголовок на телефонах */
+@media (max-width: 480px){
+  h1{
+    font-size: 18px;
+    line-height: 1.25;
+  }
+
+  .subtitle{
+    font-size: 14px;
+  }
+
+  .mono{
+    font-size: 12px;
+  }
+}
+
 
