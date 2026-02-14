@@ -778,5 +778,46 @@ h1, h2, h3, p, .mono, .subtitle {
     font-size: 12px;
   }
 }
+/* =========================
+   FIX: ничего не вылазит на телефоне
+   Причины: grid min-width + длинные строки
+   ========================= */
+
+/* Важно для CSS Grid: разрешаем детям сжиматься */
+.grid > * { min-width: 0; }
+.panel { min-width: 0; }
+.result-block { min-width: 0; }
+.metrics { min-width: 0; }
+
+/* Запрещаем горизонтальный вылез страницы */
+html, body { overflow-x: hidden; }
+
+/* Разрешаем перенос обычного текста */
+h1, h2, h3, p, .subtitle, .pill, label, .hint {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Самое важное: длинные бинарные строки НЕ ломают верстку
+   Вместо "вылазит" — появляется аккуратный горизонтальный скролл внутри блока */
+.out {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Чтобы подсветка битов не расширяла контейнер */
+.out span { display: inline-block; }
+
+/* Чуть компактнее на телефоне */
+@media (max-width: 520px) {
+  .pill { white-space: normal; text-align: left; }
+  h1 { font-size: 19px; line-height: 1.25; }
+  .subtitle { font-size: 13.5px; line-height: 1.4; }
+}
+
 
 
