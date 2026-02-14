@@ -611,3 +611,139 @@ input[type="range"] {
 		grid-template-columns: 1fr;
 	}
 }
+/* =========================
+   Супер-адаптивность для телефонов
+   ========================= */
+
+/* Небольшая оптимизация для очень узких экранов */
+@media (max-width: 560px){
+  .container{
+    width: 92vw;
+    padding: 18px 0;
+  }
+
+  .header{ padding-top: 22px; }
+
+  .brand{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .logo{
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  h1{
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .subtitle{
+    font-size: 13px;
+    line-height: 1.4;
+    max-width: 100%;
+  }
+
+  .card{
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .card-head{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .pill{
+    width: 100%;
+    text-align: center;
+  }
+
+  .panel{
+    padding: 12px;
+  }
+
+  /* Сетки в одну колонку */
+  .grid{
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .two-col{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Переключатели и радио — вертикально */
+  .segmented{
+    flex-direction: column;
+  }
+
+  .radio-row{
+    flex-direction: column;
+  }
+
+  /* BER inline: поле и подсказка в столбик */
+  .inline{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  /* Кнопки на всю ширину */
+  .actions{
+    flex-direction: column;
+  }
+
+  .btn{
+    width: 100%;
+  }
+
+  /* Результаты чуть компактнее */
+  .mono{
+    font-size: 12.5px;
+  }
+
+  .result-block{
+    padding: 10px;
+  }
+
+  .metric-value{
+    font-size: 16px;
+  }
+
+  /* Таблица: чтобы на телефоне не ломала верстку */
+  .table-wrap{
+    border-radius: 14px;
+  }
+
+  .tbl{
+    min-width: 460px; /* меньше, чтобы скролл был комфортнее */
+  }
+
+  .tbl th, .tbl td{
+    padding: 9px 9px;
+    font-size: 12px;
+  }
+
+  /* Нижняя плашка тоже компактнее */
+  .btn-plate{
+    padding: 12px 12px;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+}
+
+/* Ещё более узкие экраны (очень маленькие телефоны) */
+@media (max-width: 380px){
+  h1{ font-size: 18px; }
+  .subtitle{ font-size: 12.5px; }
+  .pill{ font-size: 11.5px; }
+  .mono{ font-size: 12px; }
+  .tbl{ min-width: 420px; }
+}
+
