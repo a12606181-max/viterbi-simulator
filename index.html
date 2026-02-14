@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Веб-симулятор: Свёрточный код + Витерби</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <!-- Декоративный фон -->
+    <div class="bg-waves" aria-hidden="true"></div>
+
+    <header class="container header">
+        <div class="brand">
+            <div class="logo" aria-hidden="true">
+                <!-- Встроенная SVG-иконка -->
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    <path d="M18.5 16.2l1.8 1.8 3.2-3.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div>
+                <h1>Веб-симулятор: Свёрточный код + Витерби</h1>
+                <p class="subtitle">Кодер → канал с ошибками → декодер Витерби (hard-decision) с подсветкой ошибок и таблицей шагов.</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Симулятор -->
+        <section class="card">
+            <div class="card-head">
+                <h2>Симуляция</h2>
+                <span class="pill">Статический сайт • Работает локально и на GitHub Pages</span>
+            </div>
+
+            <div class="grid">
+                <!-- Левая колонка: ввод -->
+                <div class="panel">
+                    <h3 class="panel-title">
+                        <!-- Встроенная SVG-иконка -->
+                        <span class="icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M4 6h16M4 12h10M4 18h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                            </svg>
+                        </span>
+                        Ввод данных
+                    </h3>
+
+                    <div class="field">
+                        <label for="inputBits">Бинарная строка</label>
+                        <input id="inputBits" type="text" inputmode="numeric" autocomplete="off" spellcheck="false"
+                               placeholder="например: 1011010010" value="1011010010" />
+                        <div class="hint">Разрешены только <b>0</b> и <b>1</b>. Пробелы игнорируются.</div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3 class="panel-title">Параметры кода</h3>
+
+                    <div class="two-col">
+                        <div class="field">
+                            <label for="nVal">n</label>
+                            <input id="nVal" type="number" min="2" max="2" value="2" />
+                            <div class="hint">Сейчас поддерживается n=2 (скорость 1/2).</div>
+                        </div>
+                        <div class="field">
+                            <label for="kVal">k</label>
+                            <input id="kVal" type="number" min="1" max="1" value="1" />
+                            <div class="hint">Сейчас поддерживается k=1.</div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="row" for="terminate">
+                            <input id="terminate" type="checkbox" checked />
+                            <span>Терминировать код (добавить «хвост» из K−1 нулей для возврата в состояние 0)</span>
+                        </label>
+                        <div class="hint">Рекомендуется: Витерби тогда восстанавливает стабильнее.</div>
+                    </div>
+
+                    <div class="field">
+                        <label>Генераторы (любая форма)</label>
+
+                        <div class="segmented">
+                            <button class="seg-btn active" type="button" id="tabOct">Восьмеричные (напр. 7,5)</button>
+                            <button class="seg-btn" type="button" id="tabBin">Бинарные (напр. 111 и 101)</button>
+                        </div>
+
+                        <div id="octBox" class="tabbox">
+                            <div class="two-col">
+                                <div class="field">
+                                    <label for="genOct1">g₁ (oct)</label>
+                                    <input id="genOct1" type="text" value="7" />
+                                </div>
+                                <div class="field">
+                                    <label for="genOct2">g₂ (oct)</label>
+                                    <input id="genOct2" type="text" value="5" />
+                                </div>
+                            </div>
+                            <div class="hint">Для (2,1,3) часто используют (7,5) в восьмеричной форме.</div>
+                        </div>
+
+                        <div id="binBox" class="tabbox hidden">
+                            <div class="two-col">
+                                <div class="field">
+                                    <label for="genBin1">g₁ (bin)</label>
+                                    <input id="genBin1" type="text" value="111" />
+                                </div>
+                                <div class="field">
+                                    <label for="genBin2">g₂ (bin)</label>
+                                    <input id="genBin2" type="text" value="101" />
+                                </div>
+                            </div>
+                            <div class="hint">Длина бинарного генератора задаёт constraint length <b>K</b>.</div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3 class="panel-title">Ошибки в канале</h3>
+
+                    <div class="field">
+                        <label>Режим внесения ошибок</label>
+                        <div class="radio-row">
+                            <label class="radio">
+                                <input type="radio" name="noiseMode" value="ber" checked />
+                                <span>Случайно по BER</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="noiseMode" value="fixed" />
+                                <span>Фиксированное количество</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="berControls" class="noiseBox">
+                        <div class="field">
+                            <label for="berRange">BER (0…0.3)</label>
+                            <input id="berRange" type="range" min="0" max="0.3" step="0.01" value="0.05" />
+                            <div class="inline">
+                                <input id="berNumber" type="number" min="0" max="0.3" step="0.01" value="0.05" />
+                                <span class="hint">Например 0.05</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="fixedControls" class="noiseBox hidden">
+                        <div class="field">
+                            <label for="fixedErrors">Количество ошибок (0…20)</label>
+                            <input id="fixedErrors" type="number" min="0" max="20" step="1" value="3" />
+                            <div class="hint">Будет инвертировано ровно столько бит в закодированной последовательности.</div>
+                        </div>
+                    </div>
+
+                    <div class="two-col">
+                        <div class="field">
+                            <label for="seed">Seed (необязательно)</label>
+                            <input id="seed" type="text" placeholder="например: 12345" />
+                            <div class="hint">Одинаковый seed → одинаковый шум (удобно для отчёта).</div>
+                        </div>
+
+                        <div class="field">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-ghost" id="regenNoise" type="button">
+                                Сгенерировать новый шум
+                            </button>
+                            <div class="hint">Меняет ошибки, не меняя остальные параметры.</div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-primary" id="runBtn" type="button">Запустить симуляцию</button>
+                        <button class="btn btn-ghost" id="clearBtn" type="button">Очистить</button>
+                    </div>
+
+                    <div id="msg" class="message hidden" role="alert"></div>
+                </div>
+
+                <!-- Правая колонка: результаты -->
+                <div class="panel">
+                    <h3 class="panel-title">Результаты</h3>
+
+                    <div class="results">
+                        <div class="result-block">
+                            <div class="result-title">Исходная</div>
+                            <div id="outOriginal" class="mono out">—</div>
+                        </div>
+
+                        <div class="result-block">
+                            <div class="result-title">Закодированная <span class="meta">(пары бит)</span></div>
+                            <div id="outEncoded" class="mono out">—</div>
+                        </div>
+
+                        <div class="result-block">
+                            <div class="result-title">Искажённая <span class="meta">(после ошибок)</span></div>
+                            <div id="outNoisy" class="mono out">—</div>
+                        </div>
+
+                        <div class="result-block">
+                            <div class="result-title">Восстановленная <span class="meta">(Витерби)</span></div>
+                            <div id="outDecoded" class="mono out">—</div>
+                        </div>
+
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-label">Ошибки канала</div>
+                                <div id="chErr" class="metric-value">—</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Ошибки восстановления</div>
+                                <div id="decErr" class="metric-value">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3 class="panel-title">Таблица шагов (краткий лог Витерби)</h3>
+                    <div class="hint">
+                        Для каждого шага t показан принятый символ (2 бита), лучший выживший путь и его метрика.
+                        Это упрощённая визуализация, чтобы новичку было легче понять идею.
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="tbl" aria-label="Лог Витерби">
+                            <thead>
+                                <tr>
+                                    <th>t</th>
+                                    <th>Принято</th>
+                                    <th>Лучшее состояние</th>
+                                    <th>Метрика пути</th>
+                                    <th>Выбранный бит</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viterbiLog">
+                                <tr><td colspan="5" class="muted">Запусти симуляцию, чтобы увидеть лог.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Как это работает -->
+        <section class="card">
+            <div class="card-head">
+                <h2>Как это работает</h2>
+            </div>
+
+            <div class="how">
+                <div class="how-step">
+                    <div class="how-num">1</div>
+                    <div>
+                        <div class="how-title">Свёрточный кодер</div>
+                        <div class="how-text">
+                            Каждый входной бит проходит через <b>сдвиговый регистр</b>.
+                            Генераторы (например <b>111</b> и <b>101</b>) задают, какие разряды регистра XOR-ятся для получения двух выходных бит.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="how-step">
+                    <div class="how-num">2</div>
+                    <div>
+                        <div class="how-title">Канал с ошибками (BSC)</div>
+                        <div class="how-text">
+                            Мы инвертируем некоторые биты закодированной последовательности:
+                            либо случайно по вероятности <b>BER</b>, либо фиксированное число ошибок.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="how-step">
+                    <div class="how-num">3</div>
+                    <div>
+                        <div class="how-title">Декодер Витерби (hard-decision)</div>
+                        <div class="how-text">
+                            Строится <b>треллис</b> (граф состояний).
+                            На каждом шаге считаются <b>метрики Хэмминга</b> и выбирается самый вероятный путь.
+                            Потом делается <b>traceback</b> и восстанавливается исходная строка.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Нижняя кнопка-плашка -->
+        <section class="footer-plate">
+            <button class="btn btn-plate" id="authorBtn" type="button">
+                Данный веб симулятор разработала Гайдаренко Алина, студентка 2 курса СКТ(Ф)СПБГУТ
+            </button>
+        </section>
+    </main>
+
+    <!-- Модальное окно -->
+    <div id="modalOverlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal">
+            <div class="modal-head">
+                <div>
+                    <div id="modalTitle" class="modal-title">Информация</div>
+                    <div class="modal-sub">Спасибо за просмотр!</div>
+                </div>
+                <button class="btn btn-ghost btn-icon" id="closeModal" type="button" aria-label="Закрыть">
+                    ✕
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    Это учебный веб-симулятор: свёрточный код (скорость 1/2) + декодер Витерби (hard-decision).
+                    Он показывает закодированную, искажённую и восстановленную последовательности, а также проценты ошибок.
+                </p>
+                <div class="modal-tip">
+                    Подсказка: попробуй разные BER и сравни, как меняются ошибки восстановления.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
