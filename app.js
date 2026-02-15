@@ -47,6 +47,10 @@ const el = {
   authorBtn: $("#authorBtn"),
   modalOverlay: $("#modalOverlay"),
   closeModal: $("#closeModal"),
+  chartErrorsByPos: $("#chartErrorsByPos"),
+  chartBerBar: $("#chartBerBar"),
+  chartViterbiMetric: $("#chartViterbiMetric"),
+
 };
 
 /** -------------------- Переключение вкладок генераторов -------------------- */
@@ -507,6 +511,199 @@ function renderViterbiLog(rows) {
   Чтобы кнопка "Сгенерировать новый шум" меняла ошибки, но не трогала всё остальное.
 ------------------------------------------------------------------- */
 let lastNoise = null; // { mask, noisyBits, seedUsed }
+/** ===================== Графики (Chart.js) ===================== */
+let chartErrorsByPos = null;
+let chartBerBar = null;
+let chartViterbiMetric = null;
+// Ограничение, чтобы графики не становились "бесконечными"
+const MAX_POINTS = 120;
+const MAX_METRIC_POINTS = 200;
+
+function downsampleArray(arr, maxPoints) {
+  if (arr.length <= maxPoints) return { data: arr.slice(), labels: arr.map((_, i) => i + 1) };
+  const step = arr.length / maxPoints;
+  const out = [];
+  const labels = [];
+  for (let i = 0; i < maxPoints; i++) {
+    const idx = Math.floor(i * step);
+    out.push(arr[idx]);
+    labels.push(idx + 1);
+  }
+  return { data: out, labels };
+}
+
+function aggregateMaskToRate(mask, maxBars) {
+  // Если маска длинная — агрегируем в окна и считаем долю ошибок в окне (0..1)
+  if (mask.length <= maxBars) {
+    return { values: mask.slice(), labels: mask.map((_, i) => String(i + 1)), isAggregated: false };
+  }
+
+  const windowSize = Math.ceil(mask.length / maxBars);
+  const windows = Math.ceil(mask.length / windowSize);
+
+  const values = [];
+  const labels = [];
+
+  for (let w = 0; w < windows; w++) {
+    const start = w * windowSize;
+    const end = Math.min(mask.length, start + windowSize);
+    let sum = 0;
+    for (let i = start; i < end; i++) sum += mask[i];
+    values.push(sum / (end - start));
+    labels.push(`${start + 1}-${end}`);
+  }
+
+  return { values, labels, isAggregated: true };
+}
+
+function ensureChartsReady() {
+  if (typeof Chart === "undefined") return;
+  if (!el.chartErrorsByPos || !el.chartBerBar || !el.chartViterbiMetric) return;
+  if (chartErrorsByPos && chartBerBar && chartViterbiMetric) return;
+
+  // 1) Ошибки по позициям (аккуратный bar)
+  chartErrorsByPos = new Chart(el.chartErrorsByPos, {
+    type: "bar",
+    data: {
+      labels: [],
+      datasets: [
+        { label: "До Витерби (канал)", data: [] },
+        { label: "После Витерби", data: [] },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      scales: {
+        y: {
+          min: 0,
+          max: 1,
+          title: { display: true, text: "Ошибка (0/1) или доля ошибок в окне" },
+          grid: { display: false },
+        },
+        x: {
+          ticks: { maxRotation: 0, autoSkip: true },
+          title: { display: true, text: "Позиция бита / окно" },
+          grid: { display: false },
+        },
+      },
+      plugins: {
+        legend: { display: true },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+                const v = Number(ctx.raw);
+                if (v === 0 || v === 1) return `${ctx.dataset.label}: ${v}`;
+                return `${ctx.dataset.label}: ${(v * 100).toFixed(1)}%`;
+            },
+
+          },
+        },
+      },
+    },
+  });
+
+  // 2) BER до/после (bar)
+  chartBerBar = new Chart(el.chartBerBar, {
+    type: "bar",
+    data: {
+      labels: ["До декодирования", "После Витерби"],
+      datasets: [{ label: "BER (%)", data: [0, 0] }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      scales: {
+        y: { min: 0, max: 10, title: { display: true, text: "BER (%)" } },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+
+  // 3) Метрика Витерби (line)
+  chartViterbiMetric = new Chart(el.chartViterbiMetric, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{ label: "Лучшая метрика", data: [], pointRadius: 0, tension: 0.15 }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      scales: {
+       x: {
+           title: { display: true, text: "Шаг (t)" },
+           ticks: { autoSkip: true, maxRotation: 0 },
+       },
+
+        y: { title: { display: true, text: "Метрика" } },
+      },
+      plugins: { legend: { display: true } },
+    },
+  });
+}
+
+
+function updateCharts({ errMaskBefore, errMaskAfter, berBeforePct, berAfterPct, viterbiMetricByStep }) {
+  ensureChartsReady();
+  if (!chartErrorsByPos || !chartBerBar || !chartViterbiMetric) return;
+
+  // --- 1) Ошибки по позициям (не бесконечно: либо 0/1, либо доля по окнам)
+  const a = aggregateMaskToRate(errMaskBefore, MAX_POINTS);
+  const b = aggregateMaskToRate(errMaskAfter, MAX_POINTS);
+
+  // Общие labels (берём тот набор, который длиннее)
+  const labels = a.labels.length >= b.labels.length ? a.labels : b.labels;
+
+  function padTo(labels, srcLabels, values) {
+    const m = new Map();
+    for (let i = 0; i < srcLabels.length; i++) m.set(srcLabels[i], values[i]);
+    return labels.map(l => (m.has(l) ? m.get(l) : null));
+  }
+
+  chartErrorsByPos.data.labels = labels;
+  chartErrorsByPos.data.datasets[0].data = padTo(labels, a.labels, a.values);
+  chartErrorsByPos.data.datasets[1].data = padTo(labels, b.labels, b.values);
+  chartErrorsByPos.update();
+
+  // --- 2) BER до/после (аккуратный масштаб)
+  chartBerBar.data.datasets[0].data = [berBeforePct, berAfterPct];
+  const top = Math.max(5, Math.ceil(Math.max(berBeforePct, berAfterPct) / 5) * 5);
+  chartBerBar.options.scales.y.max = top;
+  chartBerBar.update();
+
+  // --- 3) Метрика Витерби по шагам (downsample, чтобы не был бесконечным)
+  const ds = downsampleArray(viterbiMetricByStep, MAX_METRIC_POINTS);
+  chartViterbiMetric.data.labels = ds.labels;
+  chartViterbiMetric.data.datasets[0].data = ds.data;
+  chartViterbiMetric.update();
+}
+function resetCharts() {
+  ensureChartsReady();
+
+  if (chartErrorsByPos) {
+    chartErrorsByPos.data.labels = [];
+    chartErrorsByPos.data.datasets.forEach(ds => (ds.data = []));
+    chartErrorsByPos.update();
+  }
+
+  if (chartBerBar) {
+    chartBerBar.data.datasets[0].data = [0, 0];
+    chartBerBar.update();
+  }
+
+  if (chartViterbiMetric) {
+    chartViterbiMetric.data.labels = [];
+    chartViterbiMetric.data.datasets[0].data = [];
+    chartViterbiMetric.update();
+  }
+}
+
+
+
 
 /** -------------------- Основной запуск симуляции -------------------- */
 function runSimulation({ regenerateNoise = false } = {}) {
@@ -574,6 +771,23 @@ function runSimulation({ regenerateNoise = false } = {}) {
 
   el.chErr.textContent = `${ch.errors}/${ch.total} = ${ch.pct.toFixed(2)}%`;
   el.decErr.textContent = `${de.errors}/${de.total} = ${de.pct.toFixed(2)}%`;
+    // 8.5) Данные для графиков
+  const errMaskBefore = noise.mask.slice();
+
+  const origBitsArr = inputStr.split("").map(Number);
+  const decBitsArr = vit.decodedBits;
+  const errMaskAfter = origBitsArr.map((b, i) => (b !== (decBitsArr[i] ?? 0) ? 1 : 0));
+
+  const viterbiMetricByStep = (vit.briefLog || []).map(r => r.metric);
+
+  updateCharts({
+    errMaskBefore,
+    errMaskAfter,
+    berBeforePct: ch.pct,
+    berAfterPct: de.pct,
+    viterbiMetricByStep,
+  });
+
 
   // 9) Лог Витерби
   renderViterbiLog(vit.briefLog);
@@ -590,6 +804,8 @@ function clearAll() {
   el.decErr.textContent = "—";
   el.viterbiLog.innerHTML = `<tr><td colspan="5" class="muted">Запусти симуляцию, чтобы увидеть лог.</td></tr>`;
   lastNoise = null;
+  resetCharts();
+
 }
 
 /** -------------------- События кнопок -------------------- */
