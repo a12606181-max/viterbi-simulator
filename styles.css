@@ -616,167 +616,183 @@ input[type="range"] {
    ========================= */
 
 /* Небольшая оптимизация для очень узких экранов */
-@media (max-width: 560px){
-  .container{
-    width: 92vw;
-    padding: 18px 0;
-  }
+@media (max-width: 560px) {
+	.container {
+		width: 92vw;
+		padding: 18px 0;
+	}
 
-  .header{ padding-top: 22px; }
+	.header {
+		padding-top: 22px;
+	}
 
-  .brand{
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
+	.brand {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
 
-  .logo{
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-  }
+	.logo {
+		width: 42px;
+		height: 42px;
+		border-radius: 14px;
+	}
 
-  h1{
-    font-size: 20px;
-    line-height: 1.2;
-  }
+	h1 {
+		font-size: 20px;
+		line-height: 1.2;
+	}
 
-  .subtitle{
-    font-size: 13px;
-    line-height: 1.4;
-    max-width: 100%;
-  }
+	.subtitle {
+		font-size: 13px;
+		line-height: 1.4;
+		max-width: 100%;
+	}
 
-  .card{
-    padding: 14px;
-    border-radius: 16px;
-  }
+	.card {
+		padding: 14px;
+		border-radius: 16px;
+	}
 
-  .card-head{
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
+	.card-head {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
 
-  .pill{
-    width: 100%;
-    text-align: center;
-  }
+	.pill {
+		width: 100%;
+		text-align: center;
+	}
 
-  .panel{
-    padding: 12px;
-  }
+	.panel {
+		padding: 12px;
+	}
 
-  /* Сетки в одну колонку */
-  .grid{
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+	/* Сетки в одну колонку */
+	.grid {
+		grid-template-columns: 1fr;
+		gap: 12px;
+	}
 
-  .two-col{
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
+	.two-col {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
 
-  /* Переключатели и радио — вертикально */
-  .segmented{
-    flex-direction: column;
-  }
+	/* Переключатели и радио — вертикально */
+	.segmented {
+		flex-direction: column;
+	}
 
-  .radio-row{
-    flex-direction: column;
-  }
+	.radio-row {
+		flex-direction: column;
+	}
 
-  /* BER inline: поле и подсказка в столбик */
-  .inline{
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
+	/* BER inline: поле и подсказка в столбик */
+	.inline {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 8px;
+	}
 
-  /* Кнопки на всю ширину */
-  .actions{
-    flex-direction: column;
-  }
+	/* Кнопки на всю ширину */
+	.actions {
+		flex-direction: column;
+	}
 
-  .btn{
-    width: 100%;
-  }
+	.btn {
+		width: 100%;
+	}
 
-  /* Результаты чуть компактнее */
-  .mono{
-    font-size: 12.5px;
-  }
+	/* Результаты чуть компактнее */
+	.mono {
+		font-size: 12.5px;
+	}
 
-  .result-block{
-    padding: 10px;
-  }
+	.result-block {
+		padding: 10px;
+	}
 
-  .metric-value{
-    font-size: 16px;
-  }
+	.metric-value {
+		font-size: 16px;
+	}
 
-  /* Таблица: чтобы на телефоне не ломала верстку */
-  .table-wrap{
-    border-radius: 14px;
-  }
+	/* Таблица: чтобы на телефоне не ломала верстку */
+	.table-wrap {
+		border-radius: 14px;
+	}
 
-  .tbl{
-    min-width: 460px; /* меньше, чтобы скролл был комфортнее */
-  }
+	.tbl {
+		min-width: 460px; /* меньше, чтобы скролл был комфортнее */
+	}
 
-  .tbl th, .tbl td{
-    padding: 9px 9px;
-    font-size: 12px;
-  }
+		.tbl th, .tbl td {
+			padding: 9px 9px;
+			font-size: 12px;
+		}
 
-  /* Нижняя плашка тоже компактнее */
-  .btn-plate{
-    padding: 12px 12px;
-    font-size: 13px;
-    line-height: 1.3;
-  }
+	/* Нижняя плашка тоже компактнее */
+	.btn-plate {
+		padding: 12px 12px;
+		font-size: 13px;
+		line-height: 1.3;
+	}
 }
 
 /* Ещё более узкие экраны (очень маленькие телефоны) */
-@media (max-width: 380px){
-  h1{ font-size: 18px; }
-  .subtitle{ font-size: 12.5px; }
-  .pill{ font-size: 11.5px; }
-  .mono{ font-size: 12px; }
-  .tbl{ min-width: 420px; }
+@media (max-width: 380px) {
+	h1 {
+		font-size: 18px;
+	}
+
+	.subtitle {
+		font-size: 12.5px;
+	}
+
+	.pill {
+		font-size: 11.5px;
+	}
+
+	.mono {
+		font-size: 12px;
+	}
+
+	.tbl {
+		min-width: 420px;
+	}
 }
 /* ===== Фикс масштаба и вылезания текста на телефонах ===== */
 
 html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
 }
 
 body {
-  overflow-x: hidden;
+	overflow-x: hidden;
 }
 
 /* Чтобы длинные строки переносились */
 h1, h2, h3, p, .mono, .subtitle {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 /* Немного уменьшаем заголовок на телефонах */
-@media (max-width: 480px){
-  h1{
-    font-size: 18px;
-    line-height: 1.25;
-  }
+@media (max-width: 480px) {
+	h1 {
+		font-size: 18px;
+		line-height: 1.25;
+	}
 
-  .subtitle{
-    font-size: 14px;
-  }
+	.subtitle {
+		font-size: 14px;
+	}
 
-  .mono{
-    font-size: 12px;
-  }
+	.mono {
+		font-size: 12px;
+	}
 }
 /* =========================
    FIX: ничего не вылазит на телефоне
@@ -784,40 +800,165 @@ h1, h2, h3, p, .mono, .subtitle {
    ========================= */
 
 /* Важно для CSS Grid: разрешаем детям сжиматься */
-.grid > * { min-width: 0; }
-.panel { min-width: 0; }
-.result-block { min-width: 0; }
-.metrics { min-width: 0; }
+.grid > * {
+	min-width: 0;
+}
+
+.panel {
+	min-width: 0;
+}
+
+.result-block {
+	min-width: 0;
+}
+
+.metrics {
+	min-width: 0;
+}
 
 /* Запрещаем горизонтальный вылез страницы */
-html, body { overflow-x: hidden; }
+html, body {
+	overflow-x: hidden;
+}
 
 /* Разрешаем перенос обычного текста */
 h1, h2, h3, p, .subtitle, .pill, label, .hint {
-  overflow-wrap: anywhere;
-  word-break: break-word;
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 /* Самое важное: длинные бинарные строки НЕ ломают верстку
    Вместо "вылазит" — появляется аккуратный горизонтальный скролл внутри блока */
 .out {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
+	display: block;
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+	-webkit-overflow-scrolling: touch;
 }
 
-/* Чтобы подсветка битов не расширяла контейнер */
-.out span { display: inline-block; }
+	/* Чтобы подсветка битов не расширяла контейнер */
+	.out span {
+		display: inline-block;
+	}
 
 /* Чуть компактнее на телефоне */
 @media (max-width: 520px) {
-  .pill { white-space: normal; text-align: left; }
-  h1 { font-size: 19px; line-height: 1.25; }
-  .subtitle { font-size: 13.5px; line-height: 1.4; }
+	.pill {
+		white-space: normal;
+		text-align: left;
+	}
+
+	h1 {
+		font-size: 19px;
+		line-height: 1.25;
+	}
+
+	.subtitle {
+		font-size: 13.5px;
+		line-height: 1.4;
+	}
+}
+/* ===================== Charts ===================== */
+.charts-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px;
+	margin-top: 10px;
 }
 
+.chart-card {
+	border: 1px solid rgba(255,255,255,0.08);
+	background: rgba(255,255,255,0.03);
+	border-radius: 14px;
+	padding: 12px;
+}
 
+	.chart-card.chart-wide {
+		grid-column: 1 / -1;
+	}
 
+.chart-title {
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.chart-note {
+	margin-top: 8px;
+	font-size: 12px;
+	opacity: 0.75;
+}
+
+/* ВАЖНО: фиксируем высоту, иначе canvas может стать "бесконечным" */
+.chart-card canvas {
+	width: 100% !important;
+	height: 220px !important;
+	display: block;
+}
+
+.chart-card.chart-wide canvas {
+	height: 260px !important;
+}
+
+@media (max-width: 900px) {
+	.charts-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.chart-card.chart-wide {
+		grid-column: auto;
+	}
+}
+/* ===== Charts (аккуратный вид) ===== */
+.charts-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	margin-top: 12px;
+}
+
+.chart-card {
+	background: rgba(255,255,255,0.55);
+	border: 1px solid rgba(0,0,0,0.06);
+	border-radius: 14px;
+	padding: 14px 14px 10px;
+	box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+	.chart-card.chart-wide {
+		grid-column: 1 / -1;
+	}
+
+.chart-title {
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.chart-note {
+	margin-top: 8px;
+	font-size: 12px;
+	opacity: 0.75;
+}
+
+/* фикс высоты, чтобы не было “бесконечной простыни” */
+.chart-card canvas {
+	width: 100% !important;
+	height: 220px !important;
+	display: block;
+}
+
+.chart-card.chart-wide canvas {
+	height: 260px !important;
+}
+
+/* на телефоне — в одну колонку */
+@media (max-width: 900px) {
+	.charts-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.chart-card.chart-wide {
+		grid-column: auto;
+	}
+}
